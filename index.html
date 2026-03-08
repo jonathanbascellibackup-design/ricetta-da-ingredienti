@@ -2,33 +2,40 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Chef Offline Base</title>
+    <title>Chef Flash - No API</title>
     <script type="module">
         import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
 
         let generator;
         async function init() {
-            document.getElementById('status').innerText = "🤖 Lo Chef sta arrivando (caricamento)...";
-            // Questo scarica il modello solo la prima volta
-            generator = await pipeline('text-generation', 'Xenova/llama2-7b-summarizer-onnx');
-            document.getElementById('status').innerText = "✅ Chef pronto (Senza API!)";
+            const status = document.getElementById('status');
+            status.innerText = "⚡ Preparazione cucina (5-10 sec)...";
+            // Usiamo TinyLlama: piccolissimo e veloce
+            generator = await pipeline('text-generation', 'Xenova/TinyLlama-1.1B-Chat-v1.0');
+            status.innerText = "✅ Chef Pronto!";
         }
         window.init = init;
 
         async function genera() {
             const i = document.getElementById('ingr').value;
-            document.getElementById('res').innerText = "Sto scrivendo la ricetta...";
-            const out = await generator(`Crea una ricetta con: ${i}`, { max_new_tokens: 200 });
-            document.getElementById('res').innerText = out[0].generated_text;
+            const res = document.getElementById('res');
+            res.innerText = "🍳 Sto cucinando...";
+            
+            const prompt = `<|system|>Sei un cuoco veloce.</s><|user|>Ricetta con: ${i}</s><|assistant|>`;
+            const out = await generator(prompt, { max_new_tokens: 150, temperature: 0.7 });
+            
+            // Puliamo il testo per mostrare solo la risposta
+            const testo = out[0].generated_text.split('<|assistant|>')[1];
+            res.innerText = testo || "Ecco la tua ricetta!";
         }
         window.genera = genera;
     </script>
 </head>
 <body onload="init()">
-    <h1>👨‍🍳 Chef Base (No API / No Chiavi)</h1>
+    <h2>⚡ Chef Flash (Locale e Veloce)</h2>
     <p id="status">Inizializzazione...</p>
-    <textarea id="ingr" placeholder="Cosa hai in frigo?"></textarea>
-    <button onclick="genera()">Crea Ricetta</button>
-    <div id="res" style="white-space: pre-wrap; background: #f0f0f0; padding: 10px;"></div>
+    <textarea id="ingr" style="width:100%; height:60px;" placeholder="Ingredienti..."></textarea>
+    <button onclick="genera()" style="width:100%; padding:10px; background:#e67e22; color:white; border:none;">Genera Subito</button>
+    <div id="res" style="white-space: pre-wrap; margin-top:15px; background:#f9f9f9; padding:10px;"></div>
 </body>
 </html>
