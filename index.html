@@ -1,98 +1,32 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <title>AI Chef - Ricette Intelligenti</title>
-    <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; line-height: 1.6; }
-        textarea { width: 100%; height: 100px; margin-bottom: 10px; }
-        button { padding: 10px 20px; background-color: #27ae60; color: white; border: none; cursor: pointer; }
-        #ricetta { margin-top: 20px; white-space: pre-wrap; background: #f9f9f9; padding: 15px; border-radius: 8px; }
-        .status { font-size: 0.9em; color: #666; }
-    </style>
-</head>
-<body>
+async function chiamaGemini(prompt, keyIndex) {
+    if (keyIndex >= apiKeys.length) {
+        throw new Error("Tutte le chiavi API sono esaurite.");
+    }
 
-    <h1>👨‍🍳 Chef Gemini</h1>
-    <p>Inserisci gli ingredienti e le quantità che hai a disposizione:</p>
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeys[keyIndex]}`;
     
-    <textarea id="ingredienti" placeholder="Esempio: 2 uova, 200g farina, 100ml latte..."></textarea>
-    <button onclick="generaRicetta()">Genera Ricetta</button>
-    
-    <div class="status" id="status"></div>
-    <div id="ricetta"></div>
+    const requestBody = {
+        contents: [{
+            parts: [{ text: "Sei un cuoco. Crea una ricetta con: " + prompt }]
+        }]
+    };
 
-    <script>
-        let apiKeys = [];
-        let currentKeyIndex = 0;
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+    });
 
-        // Carica le chiavi dal file JSON all'avvio
-        async function caricaChiavi() {
-            try {
-                const response = await fetch('api.json');
-                const data = await response.json();
-                apiKeys = data.keys;
-                document.getElementById('status').innerText = `Caricate ${apiKeys.length} chiavi API.`;
-            } catch (err) {
-                console.error("Errore nel caricamento di api.json:", err);
-                document.getElementById('status').innerText = "Errore: file api.json non trovato o non valido.";
-            }
+    const data = await response.json();
+
+    // --- CONTROLLO DI SICUREZZA AGGIUNTO ---
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+        return data.candidates[0].content.parts[0].text;
+    } else {
+        // Se c'è un errore di quota (429), passa alla prossima chiave
+        if (response.status === 429) {
+            return chiamaGemini(prompt, keyIndex + 1);
         }
-
-        async function chiamaGemini(prompt, keyIndex) {
-            if (keyIndex >= apiKeys.length) {
-                throw new Error("Tutte le chiavi API sono esaurite o non valide.");
-            }
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeys[keyIndex]}`;
-            
-            const requestBody = {
-                contents: [{
-                    parts: [{
-                        text: `System: Sei un cuoco provetto. Il tuo compito è generare ricette ottime e complete usando SOLO gli ingredienti forniti dall'utente. 
-                               Puoi decidere di non usare tutto quello che ti viene dato, ma NON puoi aggiungere ingredienti mancanti (tranne acqua o sale se non specificati). 
-                               Fornisci dosi precise, passaggi chiari e un titolo per il piatto.
-                               
-                               User: Ecco i miei ingredienti: ${prompt}`
-                    }]
-                }]
-            };
-
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody)
-            });
-
-            if (response.status === 429 || response.status === 401) {
-                console.warn(`Chiave ${keyIndex} fallita (Errore ${response.status}). Provo la prossima...`);
-                return chiamaGemini(prompt, keyIndex + 1); // Ricorsione sulla prossima chiave
-            }
-
-            const data = await response.json();
-            return data.candidates[0].content.parts[0].text;
-        }
-
-        async function generaRicetta() {
-            const input = document.getElementById('ingredienti').value;
-            const display = document.getElementById('ricetta');
-            const status = document.getElementById('status');
-
-            if (!input) return alert("Inserisci almeno un ingrediente!");
-
-            display.innerText = "Lo chef sta pensando...";
-            
-            try {
-                const risultato = await chiamaGemini(input, currentKeyIndex);
-                display.innerText = risultato;
-                status.innerText = `Pronto! (Utilizzata chiave API #${currentKeyIndex + 1})`;
-            } catch (err) {
-                display.innerText = "Errore: " + err.message;
-            }
-        }
-
-        // Inizializza
-        caricaChiavi();
-    </script>
-</body>
-</html>
+        throw new Error("Gemini non ha generato una risposta. Controlla i filtri di sicurezza o la validità della chiave.");
+    }
+}
