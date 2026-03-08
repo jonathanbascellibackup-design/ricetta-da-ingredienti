@@ -2,40 +2,37 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Chef Flash - No API</title>
+    <title>Chef Istantaneo</title>
     <script type="module">
         import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
 
-        let generator;
+        let pipe;
         async function init() {
             const status = document.getElementById('status');
-            status.innerText = "⚡ Preparazione cucina (5-10 sec)...";
-            // Usiamo TinyLlama: piccolissimo e veloce
-            generator = await pipeline('text-generation', 'Xenova/TinyLlama-1.1B-Chat-v1.0');
-            status.innerText = "✅ Chef Pronto!";
+            status.innerText = "⏳ Preparazione cucina in corso...";
+            // Modello super leggero (circa 40MB), si carica in un attimo
+            pipe = await pipeline('text-generation', 'Xenova/TinyLlama-1.1B-Chat-v1.0');
+            status.innerText = "✅ Chef pronto!";
         }
         window.init = init;
 
-        async function genera() {
-            const i = document.getElementById('ingr').value;
+        async function cucina() {
+            const ingr = document.getElementById('ingr').value;
             const res = document.getElementById('res');
-            res.innerText = "🍳 Sto cucinando...";
+            res.innerText = "👨‍🍳 Sto scrivendo...";
             
-            const prompt = `<|system|>Sei un cuoco veloce.</s><|user|>Ricetta con: ${i}</s><|assistant|>`;
-            const out = await generator(prompt, { max_new_tokens: 150, temperature: 0.7 });
-            
-            // Puliamo il testo per mostrare solo la risposta
-            const testo = out[0].generated_text.split('<|assistant|>')[1];
-            res.innerText = testo || "Ecco la tua ricetta!";
+            const prompt = `Ricetta veloce con: ${ingr}`;
+            const out = await pipe(prompt, { max_new_tokens: 100 });
+            res.innerText = out[0].generated_text;
         }
-        window.genera = genera;
+        window.cucina = cucina;
     </script>
 </head>
-<body onload="init()">
-    <h2>⚡ Chef Flash (Locale e Veloce)</h2>
-    <p id="status">Inizializzazione...</p>
-    <textarea id="ingr" style="width:100%; height:60px;" placeholder="Ingredienti..."></textarea>
-    <button onclick="genera()" style="width:100%; padding:10px; background:#e67e22; color:white; border:none;">Genera Subito</button>
-    <div id="res" style="white-space: pre-wrap; margin-top:15px; background:#f9f9f9; padding:10px;"></div>
+<body onload="init()" style="font-family:sans-serif; text-align:center; padding:20px;">
+    <h1>🍳 Chef Istantaneo</h1>
+    <p id="status">Caricamento...</p>
+    <input type="text" id="ingr" placeholder="Cosa hai in frigo?" style="width:80%; padding:10px;">
+    <button onclick="cucina()" style="padding:10px 20px; margin-top:10px; cursor:pointer;">Genera</button>
+    <div id="res" style="margin-top:20px; background:#f0f0f0; padding:15px; border-radius:8px;"></div>
 </body>
 </html>
