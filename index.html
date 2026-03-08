@@ -2,35 +2,37 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Chef Istantaneo v3</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; background: #fff5e6; }
-        .box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        input { width: 80%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
-        button { background: #ff6b6b; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; }
-    </style>
+    <title>Chef AI - Generatore Istantaneo</title>
 </head>
-<body>
-    <div class="box">
-        <h1>👨‍🍳 Chef Super-Fast</h1>
-        <input type="text" id="ingr" placeholder="Es: uova, latte, farina">
-        <button onclick="trovaRicetta()">Cucina Ora!</button>
-        <div id="res" style="margin-top:20px; text-align:left; font-style: italic;"></div>
-    </div>
+<body style="font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; background: #fafafa;">
+    <h1>👨‍🍳 Chef Creativo (No-DB)</h1>
+    <p>Inserisci gli ingredienti e l'IA creerà una ricetta nuova ora.</p>
+    <textarea id="ingr" style="width:100%; height:80px;" placeholder="Es: uova, latte, un pizzico di sale..."></textarea>
+    <button onclick="creaOra()" style="width:100%; padding:15px; background: #e67e22; color:white; border:none; margin-top:10px; cursor:pointer;">CREA RICETTA</button>
+    
+    <div id="res" style="margin-top:20px; background:white; padding:15px; border-left: 5px solid #e67e22; white-space: pre-wrap;"></div>
 
     <script>
-        const ricette = {
-            "uova,latte": "Omelette soffice: Sbatti le uova con un goccio di latte e cuoci in padella con burro.",
-            "uova,farina": "Pasta fresca veloce: Impasta 1 uovo ogni 100g di farina finché non è liscio.",
-            "latte,farina": "Besciamella base: Scalda il latte e aggiungi la farina mescolando per addensare.",
-            "uova,latte,farina": "Crepes classiche: Mescola tutto insieme e cuoci un mestolo alla volta in padella calda."
-        };
-
-        function trovaRicetta() {
-            const i = document.getElementById('ingr').value.toLowerCase().replace(/ /g, '');
+        async function creaOra() {
+            const i = document.getElementById('ingr').value;
             const res = document.getElementById('res');
-            // Cerca la combinazione esatta o suggerisce la più vicina
-            res.innerText = ricette[i] || "Ricetta non trovata nel database rapido, ma prova a fare una frittata mista!";
+            res.innerText = "👨‍🍳 Lo chef sta inventando...";
+
+            // Modello GPT-2 o Mistral (Serverless): non deve scaricare nulla sul PC
+            try {
+                const response = await fetch("https://api-inference.huggingface.co/models/Mistral-7B-Instruct-v0.2", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        inputs: `[INST] Crea una ricetta originale con questi ingredienti: ${i}. Sii creativo e scrivi in italiano. [/INST]`,
+                        parameters: { max_new_tokens: 300 }
+                    })
+                });
+                const data = await response.json();
+                res.innerText = data[0].generated_text.split("[/INST]")[1] || "Errore di creazione.";
+            } catch (e) {
+                res.innerText = "Il server è troppo occupato. Riprova tra 5 secondi!";
+            }
         }
     </script>
 </body>
