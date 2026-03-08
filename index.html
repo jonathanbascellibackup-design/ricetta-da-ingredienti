@@ -1,8 +1,27 @@
+<div class="premium-box">
+    <h3>Configurazione Chef</h3>
+    <select id="modelChoice">
+        <option value="gemini-1.5-flash">Fulminea (Flash)</option>
+        <option value="gemini-3.1-pro-preview">Super Intelligente (Pro 3.1)</option>
+    </select>
+    
+    <label>Limitazioni (es. No glutine, max 30g carboidrati):</label>
+    <input type="text" id="dietLimits" placeholder="Inserisci intolleranze o limiti...">
+    
+    <button onclick="cucina()">Crea Ricetta su Misura</button>
+</div>
+
 <script>
-async function generaSemplice() {
-    const ingr = document.getElementById('ingredienti').value;
-    const model = "gemini-1.5-flash"; // Modello rapido
-    const prompt = `Agisci come cuoco. Crea una ricetta usando solo: ${ingr}.`;
-    // ... logica fetch come visto precedentemente ...
+async function cucina() {
+    const m = document.getElementById('modelChoice').value;
+    const l = document.getElementById('dietLimits').value;
+    const i = document.getElementById('ingredienti').value;
+
+    const sistema = `Sei un esperto nutrizionista e chef. 
+    Usa questi ingredienti: ${i}. 
+    RISPETTA RIGOROSAMENTE: ${l || 'Nessuna limitazione'}.
+    Se il limite di carboidrati/grassi è basso, scegli metodi di cottura sani.`;
+    
+    // Esegui chiamata API...
 }
 </script>
