@@ -2,38 +2,55 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="6Q4TEaRQVKB0PD4H1t7xY7yGqAgwmTwEAFYNsn9m42A" />
     
     <title>Chef Stellato Groq - Jonathan Bascelli</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root { --chef-gold: #c5a059; --chef-dark: #1a1a1a; }
-        body { font-family: 'Georgia', serif; background: #f9f7f2; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        * { box-sizing: border-box; } /* Previene overflow */
+        
+        body { font-family: 'Georgia', serif; background: #f9f7f2; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
         header { background: var(--chef-dark); color: var(--chef-gold); padding: 15px; text-align: center; border-bottom: 3px solid var(--chef-gold); }
-        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .recipe { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 5px solid var(--chef-gold); max-width: 700px; margin: auto; }
-        #controls { padding: 20px; background: white; border-top: 1px solid #ddd; display: flex; gap: 10px; justify-content: center; }
-        input { width: 40%; padding: 10px; border-radius: 20px; border: 1px solid #ccc; }
-        button { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; }
-        .btn-send { background: var(--chef-dark); color: var(--chef-gold); }
-        .btn-save { background: var(--chef-gold); color: white; }
+        header h1 { margin: 0; font-size: 1.5rem; }
+
+        #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .recipe { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 5px solid var(--chef-gold); width: 100%; max-width: 700px; margin: 0 auto; word-wrap: break-word; }
+        
+        /* Box Donazione Responsive */
+        .donate-box { margin: 10px auto; padding: 15px; width: 95%; max-width: 500px; border: 2px solid #00ff88; background-color: rgba(0,0,0,0.9); box-shadow: 0 0 15px #00ff88; text-align: center; font-family: 'Courier New', monospace; }
+        
+        #controls { padding: 15px; background: white; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; position: sticky; bottom: 0; }
+        
+        /* Input e bottoni ottimizzati */
+        input#in { flex: 1; min-width: 200px; padding: 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 16px; } /* 16px evita lo zoom automatico su iOS */
+        button { padding: 12px 15px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; flex-grow: 1; }
+        
+        .btn-send { background: var(--chef-dark); color: var(--chef-gold); min-width: 120px; }
+        .btn-save { background: var(--chef-gold); color: white; min-width: 100px; }
+
+        @media (max-width: 480px) {
+            #controls { flex-direction: column; }
+            input#in { width: 100%; }
+        }
     </style>
 </head>
 <body>
 
 <header><h1>Chef Stellato & Groq</h1></header>
 
-<div style="margin: 20px auto; padding: 20px; max-width: 500px; border: 2px solid #00ff88; background-color: rgba(0,0,0,0.9); box-shadow: 0 0 20px #00ff88; text-align: center; font-family: 'Courier New', monospace;">
-    <h2 style="color: #00ff88; text-transform: uppercase; margin-top: 0;">Supporta</h2>
+<div class="donate-box">
+    <h2 style="color: #00ff88; text-transform: uppercase; margin-top: 0; font-size: 1.2rem;">Supporta</h2>
     <div style="margin-bottom: 10px;">
         <label style="color: #00ff88; display: block; margin-bottom: 5px;">Importo (mBTC):</label>
-        <input type="number" id="btcAmount" placeholder="es. 3" style="background: #111; border: 1px solid #00ff88; color: #00ff88; padding: 10px; text-align: center; width: 80%; outline: none;">
+        <input type="number" id="btcAmount" placeholder="es. 3" style="background: #111; border: 1px solid #00ff88; color: #00ff88; padding: 8px; text-align: center; width: 60%; outline: none;">
     </div>
-    <a href="#" style="background-color: #f7931a; color: #000; padding: 12px 20px; text-decoration: none; font-weight: bold; display: inline-block; border-radius: 5px; box-shadow: 0 0 10px #f7931a;">
+    <a href="#" style="background-color: #f7931a; color: #000; padding: 10px 15px; text-decoration: none; font-weight: bold; display: inline-block; border-radius: 5px; box-shadow: 0 0 10px #f7931a; font-size: 14px;">
         INVIA DONAZIONE ₿
     </a>
     <div style="margin-top: 10px;">
-        <code id="walletAddress" style="display: block; background: #222; color: #00ff88; padding: 5px; font-size: 0.7em; border: 1px solid #333; word-break: break-all;">bc1q07qywwssag8zlc5vaw036a66qrh5zchtqs2tej</code>
+        <code id="walletAddress" style="display: block; background: #222; color: #00ff88; padding: 5px; font-size: 0.65em; border: 1px solid #333; word-break: break-all;">bc1q07qywwssag8zlc5vaw036a66qrh5zchtqs2tej</code>
     </div>
 </div>
 
