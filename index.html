@@ -2,7 +2,11 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chef Stellato Groq - Jonathan Bascelli</title>
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3316770981469373" crossorigin="anonymous"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root { --chef-gold: #c5a059; --chef-dark: #1a1a1a; }
@@ -19,10 +23,10 @@
 </head>
 <body>
 
-<header><h1>Chef Stellato & Groq</h1></header>
+<header onclick="sbloccaPremium()"><h1>Chef Stellato & Groq</h1></header>
 
 <div style="margin: 20px auto; padding: 20px; max-width: 500px; border: 2px solid #00ff88; background-color: rgba(0,0,0,0.9); box-shadow: 0 0 20px #00ff88; text-align: center; font-family: 'Courier New', monospace;">
-    <h2 style="color: #00ff88; text-transform: uppercase; margin-top: 0;">Supporta</h2>
+    <h2 style="color: #00ff88; text-transform: uppercase; margin-top: 0;">Supporta lo Chef</h2>
     <div style="margin-bottom: 10px;">
         <label style="color: #00ff88; display: block; margin-bottom: 5px;">Importo (mBTC):</label>
         <input type="number" id="btcAmount" placeholder="es. 3" style="background: #111; border: 1px solid #00ff88; color: #00ff88; padding: 10px; text-align: center; width: 80%; outline: none;">
@@ -35,7 +39,7 @@
     </div>
 </div>
 
-<div id="chat"><div class="recipe">Inserisci gli ingredienti...</div></div>
+<div id="chat"><div class="recipe">Inserisci gli ingredienti e l'AI cucinerà per te...</div></div>
 
 <div id="controls">
     <input type="text" id="in" placeholder="Es: 2 uova, 100g farina...">
@@ -44,23 +48,27 @@
 </div>
 
 <script>
-    // Inizializzazione AdMob quando il dispositivo è pronto
+    // 2. CODICE ADMOB (Per l'APK/App)
     document.addEventListener('deviceready', async () => {
         try {
-            // Inizializza con il tuo ID APP dall'immagine
-            await admob.start({
-                appId: 'ca-app-pub-3316773981469373~9745837450'
-            });
-
-            // Mostra il banner con il tuo ID UNITA' PUBBLICITARIA dall'immagine
+            await admob.start({ appId: 'ca-app-pub-3316773981469373~9745837450' });
             await admob.banner.show({
                 id: 'ca-app-pub-3316773981469373/4832536834',
-                position: 'bottom', // Posiziona il banner in fondo
+                position: 'bottom',
             });
-        } catch (err) {
-            console.error('Errore caricamento AdMob:', err);
-        }
+        } catch (e) { console.log("Esecuzione in browser: AdMob disattivato."); }
     }, false);
+
+    // FUNZIONE PREMIUM (Sblocca con codice)
+    function sbloccaPremium() {
+        let codice = prompt("Codice attivazione:");
+        if (codice === "CHEF2026") {
+            alert("Premium Attivo! Pubblicità rimosse.");
+            try { admob.banner.hide(); } catch(e){}
+            document.querySelector('header').style.background = "#c5a059";
+            document.querySelector('header h1').style.color = "white";
+        }
+    }
 
     const API_KEY = "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";
     let lastRecipe = "";
@@ -81,7 +89,7 @@
                 body: JSON.stringify({
                     model: "llama-3.3-70b-versatile",
                     messages: [
-                        {role: "system", content: "Sei uno chef stellato. Crea ricette usando SOLO gli ingredienti dati (limiti massimi). Se l'input non è coerente, ignora. Firma: Strumento realizzato da Jonathan Bascelli"},
+                        {role: "system", content: "Sei uno chef stellato. Crea ricette usando SOLO gli ingredienti dati. Firma: Strumento realizzato da Jonathan Bascelli"},
                         {role: "user", content: text}
                     ]
                 })
@@ -93,7 +101,7 @@
             div.className = 'recipe';
             div.innerHTML = lastRecipe.replace(/\n/g, '<br>');
             document.getElementById('chat').appendChild(div);
-        } catch (e) { alert("Errore connessione Groq"); }
+        } catch (e) { alert("Errore Groq"); }
     }
 
     function savePDF() {
@@ -101,7 +109,7 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.text(doc.splitTextToSize(lastRecipe, 180), 10, 10);
-        doc.save("Ricetta_Jonathan_Bascelli.pdf");
+        doc.save("Ricetta_ChefStellato.pdf");
     }
 </script>
 </body>
