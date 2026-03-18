@@ -123,6 +123,40 @@
         doc.text(doc.splitTextToSize(lastRecipe, 180), 10, 10);
         doc.save("Ricetta_Jonathan_Bascelli.pdf");
     }
+<div id="smart-license-footer" style="
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    background-color: rgba(255, 255, 255, 0.95); 
+    border-top: 1px solid #eee; 
+    text-align: center; 
+    font-family: 'Arial', sans-serif; 
+    color: #888; 
+    font-size: 0.8rem;
+    padding: 15px 0;
+    z-index: 9999; 
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
+">
+    <p style="margin: 0 0 5px 0;">
+        © 2026 <strong>Scratch to Learn</strong> - Jonathan Bascelli
+    </p>
+    
+    <p style="margin: 0;">
+        Distribuito con <a href="https://github.com/jonathanbascellibackup-design/Scratch_to_learn/blob/main/LICENSE" 
+        target="_blank" 
+        style="color: #00d2ff; text-decoration: none; font-weight: bold;">Licenza PolyForm Shield</a>. 
+        Clicca per i dettagli.
+    </p>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var footerHeight = document.getElementById('smart-license-footer').offsetHeight;
+        document.body.style.paddingBottom = (footerHeight + 20) + 'px';
+    });
+</script>
+
 </script>
 </body>
 </html>
