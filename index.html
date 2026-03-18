@@ -1,196 +1,106 @@
 <!DOCTYPE html>
-
 <html lang="it">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <title>Crea ricette con ai - Jonathan Bascelli</title>
-
+    <meta name="google-site-verification" content="6Q4TEaRQVKB0PD4H1t7xY7yGqAgwmTwEAFYNsn9m42A" />
+    
+    <title>Chef Stellato Groq - Jonathan Bascelli</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <style>
-
         :root { --chef-gold: #c5a059; --chef-dark: #1a1a1a; }
-
         body { font-family: 'Georgia', serif; background: #f9f7f2; margin: 0; display: flex; flex-direction: column; height: 100vh; }
-
         header { background: var(--chef-dark); color: var(--chef-gold); padding: 15px; text-align: center; border-bottom: 3px solid var(--chef-gold); }
-
         #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-
         .recipe { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 5px solid var(--chef-gold); max-width: 700px; margin: auto; }
-
         #controls { padding: 20px; background: white; border-top: 1px solid #ddd; display: flex; gap: 10px; justify-content: center; }
-
         input { width: 40%; padding: 10px; border-radius: 20px; border: 1px solid #ccc; }
-
         button { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; }
-
         .btn-send { background: var(--chef-dark); color: var(--chef-gold); }
-
         .btn-save { background: var(--chef-gold); color: white; }
-
     </style>
-
 </head>
-
 <body>
 
 <header><h1>Chef Stellato & Groq</h1></header>
 
 <div style="margin: 20px auto; padding: 20px; max-width: 500px; border: 2px solid #00ff88; background-color: rgba(0,0,0,0.9); box-shadow: 0 0 20px #00ff88; text-align: center; font-family: 'Courier New', monospace;">
-
     <h2 style="color: #00ff88; text-transform: uppercase; margin-top: 0;">Supporta</h2>
-
     <div style="margin-bottom: 10px;">
-
         <label style="color: #00ff88; display: block; margin-bottom: 5px;">Importo (mBTC):</label>
-
         <input type="number" id="btcAmount" placeholder="es. 3" style="background: #111; border: 1px solid #00ff88; color: #00ff88; padding: 10px; text-align: center; width: 80%; outline: none;">
-
     </div>
-
     <a href="#" style="background-color: #f7931a; color: #000; padding: 12px 20px; text-decoration: none; font-weight: bold; display: inline-block; border-radius: 5px; box-shadow: 0 0 10px #f7931a;">
-
         INVIA DONAZIONE ₿
-
     </a>
-
     <div style="margin-top: 10px;">
-
         <code id="walletAddress" style="display: block; background: #222; color: #00ff88; padding: 5px; font-size: 0.7em; border: 1px solid #333; word-break: break-all;">bc1q07qywwssag8zlc5vaw036a66qrh5zchtqs2tej</code>
-
     </div>
-
 </div>
 
 <div id="chat"><div class="recipe">Inserisci gli ingredienti...</div></div>
 
 <div id="controls">
-
     <input type="text" id="in" placeholder="Es: 2 uova, 100g farina...">
-
     <button class="btn-send" onclick="askGroq()">Crea Ricetta</button>
-
     <button class="btn-save" onclick="savePDF()">Save PDF</button>
-
 </div>
 
 <script>
-
-    // Inizializzazione AdMob quando il dispositivo è pronto
-
+    // Inizializzazione AdMob
     document.addEventListener('deviceready', async () => {
-
         try {
-
-            // Inizializza con il tuo ID APP dall'immagine
-
             await admob.start({
-
                 appId: 'ca-app-pub-3316773981469373~9745837450'
-
             });
-
-            // Mostra il banner con il tuo ID UNITA' PUBBLICITARIA dall'immagine
-
             await admob.banner.show({
-
                 id: 'ca-app-pub-3316773981469373/4832536834',
-
-                position: 'bottom', // Posiziona il banner in fondo
-
+                position: 'bottom',
             });
-
         } catch (err) {
-
             console.error('Errore caricamento AdMob:', err);
-
         }
-
     }, false);
 
     const API_KEY = "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";
-
     let lastRecipe = "";
 
     async function askGroq() {
-
         const input = document.getElementById('in');
-
         const text = input.value.trim();
-
         if(!text) return;
-
         input.value = '';
-
         try {
-
             const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-
                 method: "POST",
-
                 headers: {
-
                     "Authorization": `Bearer ${API_KEY}`,
-
                     "Content-Type": "application/json"
-
                 },
-
                 body: JSON.stringify({
-
                     model: "llama-3.3-70b-versatile",
-
                     messages: [
-
                         {role: "system", content: "Sei uno chef stellato. Crea ricette usando SOLO gli ingredienti dati (limiti massimi). Se l'input non è coerente, ignora. Firma: Strumento realizzato da Jonathan Bascelli"},
-
                         {role: "user", content: text}
-
                     ]
-
                 })
-
             });
-
             const data = await response.json();
-
             lastRecipe = data.choices[0].message.content;
-
             
-
             const div = document.createElement('div');
-
             div.className = 'recipe';
-
             div.innerHTML = lastRecipe.replace(/\n/g, '<br>');
-
             document.getElementById('chat').appendChild(div);
-
         } catch (e) { alert("Errore connessione Groq"); }
-
     }
 
     function savePDF() {
-
         if(!lastRecipe) return;
-
         const { jsPDF } = window.jspdf;
-
         const doc = new jsPDF();
-
         doc.text(doc.splitTextToSize(lastRecipe, 180), 10, 10);
-
         doc.save("Ricetta_Jonathan_Bascelli.pdf");
-
     }
-
 </script>
-
 </body>
-
 </html>
-
