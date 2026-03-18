@@ -19,26 +19,22 @@
 </head>
 <body>
 
-
-
 <header><h1>Chef Stellato & Groq</h1></header>
-<div style="margin: 50px auto; padding: 30px; max-width: 500px; border: 2px solid #00ff88; background-color: rgba(0,0,0,0.9); box-shadow: 0 0 20px #00ff88; text-align: center; font-family: 'Courier New', monospace;">
-    <h2 style="color: #00ff88; text-transform: uppercase;">Supporta</h2>
-    <p style="color: #fff; font-size: 0.9em; margin-bottom: 20px;">
-         <span style="color: #f7931a; font-weight: bold;"></span> 
-    </p>
-    <div style="margin-bottom: 15px;">
+
+<div style="margin: 20px auto; padding: 20px; max-width: 500px; border: 2px solid #00ff88; background-color: rgba(0,0,0,0.9); box-shadow: 0 0 20px #00ff88; text-align: center; font-family: 'Courier New', monospace;">
+    <h2 style="color: #00ff88; text-transform: uppercase; margin-top: 0;">Supporta</h2>
+    <div style="margin-bottom: 10px;">
         <label style="color: #00ff88; display: block; margin-bottom: 5px;">Importo (mBTC):</label>
         <input type="number" id="btcAmount" placeholder="es. 3" style="background: #111; border: 1px solid #00ff88; color: #00ff88; padding: 10px; text-align: center; width: 80%; outline: none;">
     </div>
-    <a href="#" onclick="inviaDonazione()" style="background-color: #f7931a; color: #000; padding: 15px 25px; text-decoration: none; font-weight: bold; display: inline-block; border-radius: 5px; box-shadow: 0 0 10px #f7931a; margin-bottom: 20px;">
+    <a href="#" style="background-color: #f7931a; color: #000; padding: 12px 20px; text-decoration: none; font-weight: bold; display: inline-block; border-radius: 5px; box-shadow: 0 0 10px #f7931a;">
         INVIA DONAZIONE ₿
     </a>
     <div style="margin-top: 10px;">
-        <p style="color: #888; font-size: 0.7em; margin-bottom: 5px;">IL MIO WALLET CODE:</p>
-        <code id="walletAddress" style="display: block; background: #222; color: #00ff88; padding: 10px; font-size: 0.8em; border: 1px solid #333; word-break: break-all;">bc1q07qywwssag8zlc5vaw036a66qrh5zchtqs2tej</code>
+        <code id="walletAddress" style="display: block; background: #222; color: #00ff88; padding: 5px; font-size: 0.7em; border: 1px solid #333; word-break: break-all;">bc1q07qywwssag8zlc5vaw036a66qrh5zchtqs2tej</code>
     </div>
 </div>
+
 <div id="chat"><div class="recipe">Inserisci gli ingredienti...</div></div>
 
 <div id="controls">
@@ -48,6 +44,24 @@
 </div>
 
 <script>
+    // Inizializzazione AdMob quando il dispositivo è pronto
+    document.addEventListener('deviceready', async () => {
+        try {
+            // Inizializza con il tuo ID APP dall'immagine
+            await admob.start({
+                appId: 'ca-app-pub-3316773981469373~9745837450'
+            });
+
+            // Mostra il banner con il tuo ID UNITA' PUBBLICITARIA dall'immagine
+            await admob.banner.show({
+                id: 'ca-app-pub-3316773981469373/4832536834',
+                position: 'bottom', // Posiziona il banner in fondo
+            });
+        } catch (err) {
+            console.error('Errore caricamento AdMob:', err);
+        }
+    }, false);
+
     const API_KEY = "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";
     let lastRecipe = "";
 
